@@ -1,0 +1,6 @@
+   requests
+   firecrawl-py
+   openai
+   streamlit
+   llama-parse
+   llama-index

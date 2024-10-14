@@ -69,7 +69,8 @@ Voiceflow - KnowledgeFlow is a comprehensive tool for processing and managing co
 - LlamaParse
 - Firecrawl
 
-## Getting Started
+## Known Issues:
+- Table Upload (Add Row +) may require multiple clicks to add a row. Same happens when clicking + within the cell. 
 
 ## Getting Started
 

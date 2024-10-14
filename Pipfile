@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "*"
+firecrawl-py = "*"
+openai = "*"
+streamlit = "*"
+llama-extract = "*"
+llama-index-core = "*"
+llama-parse = "*"
+llama-index-readers-file = "*"
+llama-index = "*"
+
+[dev-packages]
+ipykernel = "*"
+
+[requires]
+python_version = "3.11"
