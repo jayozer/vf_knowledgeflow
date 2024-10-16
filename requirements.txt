@@ -4,3 +4,4 @@
    streamlit
    llama-parse
    llama-index
+   watchdog
