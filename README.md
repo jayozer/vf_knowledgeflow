@@ -74,7 +74,7 @@ Voiceflow - KnowledgeFlow is a comprehensive tool for processing and managing co
 
 ## Getting Started
 
-Streamlit app link: [Open the Streamlit app](https://your-streamlit-app-link.com)
+Streamlit app link: [Open the Streamlit app](https://voiceflow-knowledgeflow.streamlit.app/)
 
 ## Suggestions
 

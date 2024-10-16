@@ -14,7 +14,7 @@ from table_upload import table_upload
 
 
 # Set page config
-st.set_page_config(page_title="Voiceflow - KnowledgeFlow", layout="wide")
+st.set_page_config(page_title="Voiceflow - KnowledgeFlow")
 
 # Title and instructions
 st.title("Voiceflow - KnowledgeFlow")
