@@ -5,11 +5,11 @@ import requests
 def table_upload(api_keys, overwrite):
     if 'data' not in st.session_state:
         st.session_state.data = pd.DataFrame({
-            f"Column {i+1}": [""] * 1 for i in range(3)  # Initial state: 3 columns and 4 rows
+            f"Column {i+1}": [""] * 1 for i in range(3)  # Initial state: 3 columns and 1 row
         })
     st.subheader("Step 1: Create your table")
 
-    col1, col2, col3 = st.columns([0.3, 0.3, 2])  # Adjust the width of the columns
+    col1, col2, col3 = st.columns([0.5, 0.5, 2])  # Adjust the width of the columns
 
     with col1:
         if st.button("Add Column", key="add_column_button"):
