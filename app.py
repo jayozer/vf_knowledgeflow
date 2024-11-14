@@ -11,14 +11,14 @@ from upload2vf import upload_to_voiceflow
 from write2file4kb import prepare_download_content, get_download_object
 from llama_parse_pdf import parse_pdf
 from table_upload import table_upload
-
+from kb_tags import kb_tags_page, get_voiceflow_tags
 
 # Set page config
 st.set_page_config(page_title="Voiceflow - KnowledgeFlow")
 
 # Title and instructions
 st.title("Voiceflow - KnowledgeFlow")
-st.markdown("##### Streamline your content workflow with Voiceflow - KnowledgeFlow. Process diverse inputs, from **PDFs**, **weblinks** to **custom tables**, with advanced features like parsing and auto-summarization. Edit, download, and upload directly to Voiceflow through an intuitive interface, making content management effortless.")
+st.markdown("##### Streamline your content workflow with Voiceflow - KnowledgeFlow. Process diverse inputs, from **PDFs**, **weblinks** to **custom tables**, with advanced features like parsing, auto-summarization, and KB tag management. Edit, download, and organize your content with tags, then upload directly to Voiceflow through an intuitive interface, making content management effortless.")
 
 # Sidebar for configuration
 st.sidebar.markdown("## Configuration")
@@ -46,9 +46,6 @@ with st.sidebar.expander("🔑 API Keys", expanded=True):
 with st.sidebar.expander("⚙️ Voiceflow Upload Options"):
     overwrite = st.radio("Overwrite existing document?", [True, False], index=1)
     max_chunk_size = st.slider("Max chunk size:", min_value=500, max_value=1500, step=100, value=1000)
-    
-    #Store the max_chunk_size from slider in session state
-    #st.session_state['max_chunk_size'] = max_chunk_size
 
 # Reset App option
 with st.sidebar.expander("🔄 Session Management"):
@@ -62,7 +59,7 @@ with st.sidebar.expander("🔄 Session Management"):
             del st.session_state['file_uploader']
         
         # Reset the content input method to default
-        st.session_state['input_method'] = "Enter a Website URL"
+        st.session_state['input_method'] = "Enter Website URL"
         
         # Clear any stored website URL
         if 'website_link' in st.session_state:
@@ -78,53 +75,76 @@ if 'extracted_title' not in st.session_state:
 if 'upload_status' not in st.session_state:
     st.session_state.upload_status = None
 if 'input_method' not in st.session_state:
-    st.session_state.input_method = "Upload a File"
+    st.session_state.input_method = "Upload File"
 if 'file_uploader_key' not in st.session_state:
     st.session_state.file_uploader_key = 0
-# if 'data' not in st.session_state:
-#     st.session_state.data = pd.DataFrame({
-#         f"Column {i+1}": [""] * 4 for i in range(4)
-#     })
+if 'selected_docs' not in st.session_state:
+    st.session_state.selected_docs = []
+if 'existing_tags' not in st.session_state:
+    st.session_state.existing_tags = []
 
 # Content Input Section
-st.header("📥 Content Input")
+#st.header("📥 Content Input")
+st.header("📚 Content & 🏷️ Tag Management")
 
-input_method = st.radio("Select content input method:", ["Upload a File", "Enter a Website URL", "Upload a Table"], key="input_method")
+input_method = st.radio(
+    "Select an option:",
+    ["Upload File", "Enter Website URL", "Create + Upload Table", "Manage KB Tags"],
+    key="input_method"
+)
 
-if input_method == "Upload a File":
-    uploaded_file = st.file_uploader("Upload a .txt or .pdf file", type=["txt", "pdf"], key="file_uploader")
-    if uploaded_file is not None:
-        st.success(f"File '{uploaded_file.name}' uploaded successfully.")
-    else:
-        st.info("Please upload a .txt or .pdf file.")
+if input_method == "Manage KB Tags":
+    if "VOICEFLOW" not in api_keys or not api_keys["VOICEFLOW"]:
+        st.error("⚠️ Voiceflow API key is required for tag management. Please enter your Voiceflow API key in the sidebar configuration.")
+        # Add helpful instructions
+        with st.expander("ℹ️ How to add your Voiceflow API key"):
+            st.markdown("""
+                1. Look for the '🔑 API Keys' section in the sidebar
+                2. Enter your Voiceflow API key in the 'VOICEFLOW API Key' field
+                3. Once entered, you'll be able to manage your knowledge base tags
+            """)
+        st.stop()  # Stop execution here to prevent the KeyError
     
-    # Parsing Instructions for PDF files (only shown for "Upload a File" option)
-    with st.expander("📄 Parsing Instructions (for PDF files)"):
-        target_pages = st.text_input(
-            "Target Pages (optional, page numbering starts from page 0):",
-            value="",
-            help="Page numbering starts from page 0. Add each page number separated by commas (e.g., 1,2,5,10). Leave empty to parse all pages.",
-            placeholder="0,1,2,5,10"
-        )
+    # Only proceed with tag management if we have the API key
+    if input_method != st.session_state.get('previous_input_method'):
+        st.session_state.previous_input_method = input_method
+        tags = get_voiceflow_tags(api_keys["VOICEFLOW"])
+        if tags:
+            st.session_state.existing_tags = tags
+            st.rerun()
 
-        default_parsing_instruction = """The provided document is a PDF that may encompass various types of content such as text, images, headings, subheadings, bullet points, numbered lists, tables, and figures. Reconstruct the information in a clear and organized manner, preserving the original structure and logical flow presented in the document, unless stated otherwise in the 'exception/modification' section below. Maintain all technical terms, definitions, and descriptions as accurately as possible without altering the intended meaning. Avoid adding personal opinions, interpretations, or any additional commentary outside of the provided content.
+# Then continue with your existing code
+if input_method == "Upload File" or input_method == "Enter Website URL":
+    if input_method == "Upload File":
+        uploaded_file = st.file_uploader("Upload a .txt or .pdf file", type=["txt", "pdf"], key="file_uploader")
+        if uploaded_file is not None:
+            st.success(f"File '{uploaded_file.name}' uploaded successfully.")
+        else:
+            st.info("Please upload a .txt or .pdf file.")
+        
+        # Parsing Instructions for PDF files (only shown for "Upload File" option)
+        with st.expander("📄 Parsing Instructions (for PDF files)"):
+            target_pages = st.text_input(
+                "Target Pages (optional, page numbering starts from page 0):",
+                value="",
+                help="Page numbering starts from page 0. Add each page number separated by commas (e.g., 1,2,5,10). Leave empty to parse all pages.",
+                placeholder="0,1,2,5,10"
+            )
+
+            default_parsing_instruction = """The provided document is a PDF that may encompass various types of content such as text, images, headings, subheadings, bullet points, numbered lists, tables, and figures. Reconstruct the information in a clear and organized manner, preserving the original structure and logical flow presented in the document, unless stated otherwise in the 'exception/modification' section below. Maintain all technical terms, definitions, and descriptions as accurately as possible without altering the intended meaning. Avoid adding personal opinions, interpretations, or any additional commentary outside of the provided content.
 
 With the following exception/modification: """
 
-        parsing_instruction = st.text_area("Edit the parsing instructions as needed:", value=default_parsing_instruction, height=250)
+            parsing_instruction = st.text_area("Edit the parsing instructions as needed:", value=default_parsing_instruction, height=250)
 
-elif input_method == "Enter a Website URL":
-    website_link = st.text_input("Enter the website URL:", key="website_link")
-    if website_link:
-        st.success(f"URL '{website_link}' entered.")
-    else:
-        st.info("Please enter a website URL.")
+    elif input_method == "Enter Website URL":
+        website_link = st.text_input("Enter the website URL:", key="website_link")
+        if website_link:
+            st.success(f"URL '{website_link}' entered.")
+        else:
+            st.info("Please Enter Website URL.")
 
-elif input_method == "Upload a Table":
-    table_upload(api_keys, overwrite)
-
-# Content Processing
-if input_method != "Upload a Table":
+    # Content Processing
     st.header("⚙️ Content Processing")
 
     if st.button("Process Content"):
@@ -135,7 +155,7 @@ if input_method != "Upload a Table":
         with st.spinner("Processing content..."):
             try:
                 # Handle content input
-                if input_method == "Upload a File" and uploaded_file is not None:
+                if input_method == "Upload File" and uploaded_file is not None:
                     if uploaded_file.type == "text/plain":
                         content = uploaded_file.getvalue().decode("utf-8")
                     elif uploaded_file.type == "application/pdf":
@@ -152,7 +172,7 @@ if input_method != "Upload a Table":
                     else:
                         st.error("Unsupported file type.")
                         st.stop()
-                elif input_method == "Enter a Website URL" and website_link:
+                elif input_method == "Enter Website URL" and website_link:
                     firecrawl_app = initialize_firecrawl(api_keys["FIRECRAWL"])
                     content = extract_content(firecrawl_app, website_link)
                 else:
@@ -218,68 +238,75 @@ if input_method != "Upload a Table":
                 st.error(f"Error processing content: {str(e)}")
                 st.stop()
 
-# Display processed content if available
-if st.session_state.processed_content is not None:
-    st.header("📝 Processed Content")
+    # Display processed content if available
+    if st.session_state.processed_content is not None:
+        st.header("📝 Processed Content")
 
-    # Editable title
-    st.subheader("Document Title")
-    st.session_state.edited_title = st.text_input("Edit the document title:", value=st.session_state.extracted_title)
-    
-    # Content display in tabs
-    summary_match = re.search(r'---START_SUMMARY---(.*?)---END_SUMMARY---', st.session_state.processed_content, re.DOTALL)
-    if summary_match:
-        summary = summary_match.group(1).strip()
-        main_content = st.session_state.processed_content.split("---END_SUMMARY---", 1)[-1].strip()
-    else:
-        summary = "No summary available."
-        main_content = st.session_state.processed_content
-    # Initialize session state for edited content if not present
-    if 'edited_summary' not in st.session_state:
-        st.session_state.edited_summary = summary
-    if 'edited_main_content' not in st.session_state:
-        st.session_state.edited_main_content = main_content
-
-    tabs = st.tabs(["Summary", "Main Content"])
-    
-    with tabs[0]:
-        st.markdown("### Summary")
-        st.session_state.edited_summary = st.text_area("Summary:", value=st.session_state.edited_summary, height=200)
-    
-    with tabs[1]:
-        st.markdown("### Main Content")
-        st.session_state.edited_main_content = st.text_area("Content:", value=st.session_state.edited_main_content, height=400)
-    
-    # Action buttons
-    st.header("💾 Upload and Download")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button("Upload to Voiceflow"):
-            if st.session_state.processed_content:
-                try:
-                    filename = f"{st.session_state.edited_title}.txt"  # Create a filename
-                    # Combine edited summary and main content
-                    edited_content = f"---START_SUMMARY---\n{st.session_state.edited_summary}\n---END_SUMMARY---\n\n{st.session_state.edited_main_content}"
-                    upload_to_voiceflow(api_keys["VOICEFLOW"], edited_content, filename, overwrite, max_chunk_size)
-                    st.success("Successfully uploaded to Voiceflow")
-                except Exception as e:
-                    st.error(f"Error uploading to Voiceflow: {str(e)}")
-            else:
-                st.warning("No processed content available for upload.")
-
-    with col2:
-        # Use edited content for download
-        final_document = prepare_download_content(st.session_state.edited_summary, st.session_state.edited_main_content)
-        buffer, filename = get_download_object(final_document, f"{st.session_state.edited_title}.txt")
+        # Editable title
+        st.subheader("Document Title")
+        st.session_state.edited_title = st.text_input("Edit the document title:", value=st.session_state.extracted_title)
         
-        st.download_button(
-            label="Download Content",
-            data=buffer,
-            file_name=filename,
-            mime="text/plain"
-        )
+        # Content display in tabs
+        summary_match = re.search(r'---START_SUMMARY---(.*?)---END_SUMMARY---', st.session_state.processed_content, re.DOTALL)
+        if summary_match:
+            summary = summary_match.group(1).strip()
+            main_content = st.session_state.processed_content.split("---END_SUMMARY---", 1)[-1].strip()
+        else:
+            summary = "No summary available."
+            main_content = st.session_state.processed_content
 
-    if st.session_state.processed_content is None:
-        st.info("Please process content to proceed to download or upload.")
+        # Initialize session state for edited content if not present
+        if 'edited_summary' not in st.session_state:
+            st.session_state.edited_summary = summary
+        if 'edited_main_content' not in st.session_state:
+            st.session_state.edited_main_content = main_content
+
+        tabs = st.tabs(["Summary", "Main Content"])
+        
+        with tabs[0]:
+            st.markdown("### Summary")
+            st.session_state.edited_summary = st.text_area("Summary:", value=st.session_state.edited_summary, height=200)
+        
+        with tabs[1]:
+            st.markdown("### Main Content")
+            st.session_state.edited_main_content = st.text_area("Content:", value=st.session_state.edited_main_content, height=400)
+        
+        # Action buttons
+        st.header("💾 Upload and Download")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("Upload to Voiceflow"):
+                if st.session_state.processed_content:
+                    try:
+                        filename = f"{st.session_state.edited_title}.txt"  # Create a filename
+                        # Combine edited summary and main content
+                        edited_content = f"---START_SUMMARY---\n{st.session_state.edited_summary}\n---END_SUMMARY---\n\n{st.session_state.edited_main_content}"
+                        upload_to_voiceflow(api_keys["VOICEFLOW"], edited_content, filename, overwrite, max_chunk_size)
+                        st.success("Successfully uploaded to Voiceflow")
+                    except Exception as e:
+                        st.error(f"Error uploading to Voiceflow: {str(e)}")
+                else:
+                    st.warning("No processed content available for upload.")
+
+        with col2:
+            # Use edited content for download
+            final_document = prepare_download_content(st.session_state.edited_summary, st.session_state.edited_main_content)
+            buffer, filename = get_download_object(final_document, f"{st.session_state.edited_title}.txt")
+            
+            st.download_button(
+                label="Download Content",
+                data=buffer,
+                file_name=filename,
+                mime="text/plain"
+            )
+
+        if st.session_state.processed_content is None:
+            st.info("Please process content to proceed to download or upload.")
+
+elif input_method == "Create + Upload Table":
+    table_upload(api_keys, overwrite)
+
+elif input_method == "Manage KB Tags":
+    kb_tags_page(api_keys)
