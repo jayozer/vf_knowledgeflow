@@ -62,4 +62,4 @@ ___
 - Max Chunk slider defaults to 1000 tokens and currently cannot be adjusted 
 
 ### 💡 Feedback & Support
-Have suggestions or need help? Contact us at jay.ozer@poppydentaltech.com
+Have suggestions or need help? Contact me at jay.ozer@poppydentaltech.com
