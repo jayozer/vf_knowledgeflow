@@ -1,101 +1,65 @@
-# Voiceflow - KnowledgeFlow
+# 🚀 Streamline Your Voiceflow Content Workflow with KnowledgeFlow
 
-## Project Description
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://voiceflow-knowledgeflow.streamlit.app/)
 
 Voiceflow - KnowledgeFlow is a comprehensive tool for processing, managing content, and handling knowledge base tags from various sources. It provides a streamlined workflow for extracting, processing, and utilizing content for Voiceflow projects.
 
-### Key Features
+✨ What can KnowledgeFlow do for you?
 
-1. **Content Input**
-   - File Upload: Support for .txt and .pdf files
-   - Website Link: Extract content from URLs
-   - Table Upload
-   - Knowledge Base Tag Management
+📂 Handle diverse content inputs: Upload and process PDFs, website links, and custom tables.  
+🤖 Automate content preparation: Advanced parsing, auto-summarization, and title extraction ensure your content is clean, structured, and ready for use.   
+🏷️ Seamlessly manage KB tags: Create, attach, and organize knowledge base tags.  
+📤 Upload with confidence: Directly upload processed content into Voiceflow with options for chunk size and overwrite settings.  
 
-2. **API Key Management**
-   - Manages keys for FIRECRAWL, OPENAI, VOICEFLOW, and LLAMAPARSE
-   - Secure input and storage of API keys
+🔑 Key Features
 
-3. **PDF Parsing**
-   - Utilizes LlamaParse for efficient PDF content extraction
-   - Customizable parsing instructions for tailored results
+📝 Markdown processing and 🌐 web scraping for easy content extraction.  
+✍️ Editable content display for review before upload.  
+📥 Download option for clean summaries and full content.  
+⚙️ Integration with tools like OpenAI, Firecrawl, and LlamaParse to handle everything from parsing to auto-summarization.  
 
-4. **Web Scraping**
-   - Implements Firecrawl for accurate website content extraction
+KnowledgeFlow simplifies Voiceflow project management by handling API complexities behind the scenes. It's designed to streamline content workflows for creators of all technical skill levels, making knowledge base management effortless and efficient.  
 
-5. **Content Processing**
-   - Markdown processing
-   - Content cleaning using OpenAI's LLM
-   - Automatic summarization
+🎯 Try KnowledgeFlow here:  
 
-6. **Title Extraction**
-   - Intelligent title extraction from processed content
-   - Fallback methods ensure a title is always generated
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://voiceflow-knowledgeflow.streamlit.app/)
 
-7. **Content Display and Editing**
-   - Interactive display of processed content
-   - Editable document titles, main content
 
-8. **Table formatting and Upload**
-   - Create a tabular table 
-   - Add and edit content
+### 🛠️ Technical Features & Capabilities
+___
 
-9. **Knowledge Base Tag Management**
-   - Create and delete KB tags
-   - Attach/detach tags to/from documents
-   - Easy to use functionality with filtering and search
+**Content Processing**
+- Support for multiple input types (PDF, TXT, URLs, custom tables)
+- Advanced PDF parsing with LlamaParse
+- Precise web scraping via Firecrawl
+- Intelligent content cleaning and structuring using OpenAI
 
-10. **Download Functionality**
-    - Option to download processed content as .txt files
-    - Content split into summary and main sections
+**Knowledge Base Management**
+- Comprehensive tag creation and management
+- Smart document organization
+- Advanced filtering and search capabilities
 
-11. **Voiceflow Upload**
-    - Direct upload of processed content to Voiceflow
-    - Configurable options for overwriting and chunk size
-    - Tag management integration with Voiceflow KB
+**Integration & Security**
+- Secure API key management for all services
+- Seamless Voiceflow KB integration
+- Configurable upload settings
+- Robust error handling and validation
 
-12. **Error Handling**
-    - Robust error management for various scenarios
+### 🔄 Workflow
 
-13. **Session Management and User Interface**
-    - Reset app
-    - Clean, interactive layout built with Streamlit
-    - Intuitive buttons for main actions (process, download, upload)
-    - Tag management interface
+1. **Input** → Upload files/URLs or create tables
+2. **Process** → Automatic parsing, cleaning, and structuring
+3. **Review** → Edit and refine content as needed
+4. **Upload** → Direct integration with Voiceflow KB
 
-## How It Works
-
-1. Users can:
-   - Input content via file upload or web URL
-   - Conversion to Markdown 
-   - Summary with Sections, Key Topics, Tags
-   - Edit content before upload to VF KB
-   - Format and upload tables to KB
-   - Manage KB tags
-2. The app processes the content using various APIs and algorithms
-3. Processed content is displayed for review and editing
-4. Users can:
-   - Download the processed content
-   - Upload directly to Voiceflow
-   - Manage document tags
-
-## Technologies Used
-
-- VF Query API
-- VF Document API
-- VF Tags API
+### ⚙️ Technologies Used
+- Voiceflow APIs (Query, Document, Tags)
 - OpenAI
 - LlamaParse
 - Firecrawl
 
-## Known Issues:
-- Max Chunk is set to 1000 tokens. It is an issue with Voiceflow API. A support ticket is created. 
+### ⚠️ Known Issues
+- Max Chunk slider defaults to 1000 tokens and currently cannot be adjusted 
 
-## Getting Started
-
-Streamlit app link: [Open the Streamlit app](https://voiceflow-knowledgeflow.streamlit.app/)
-
-## Suggestions
-
-Drop me a line at jay.ozer@poppydentaltech.com
-
+### 💡 Feedback & Support
+Have suggestions or need help? Contact us at jay.ozer@poppydentaltech.com
