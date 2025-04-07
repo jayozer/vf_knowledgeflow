@@ -64,29 +64,45 @@ def create_voiceflow_tag(api_key, tag_name):
         return False
 
 def get_voiceflow_documents(api_key, document_limit=100):
-    url = f"https://api.voiceflow.com/v1/knowledge-base/docs?page=1&limit={document_limit}"
-    headers = {
-        "accept": "application/json",
-        "Authorization": api_key
-    }
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        documents_list = response.json()
-        
-        # Extract relevant fields
-        documents = [
-            {
-                "name": doc["data"]["name"],
-                "documentID": doc["documentID"],
-                "tags": doc.get("tags", [])  # Use get() with default empty list
-            }
-            for doc in documents_list["data"]
-        ]
-        return documents
-    except Exception as e:
-        st.error(f"Error fetching documents: {str(e)}")
-        return []
+    all_documents = []
+    page = 1
+    
+    while True:
+        url = f"https://api.voiceflow.com/v1/knowledge-base/docs?page={page}&limit={document_limit}"
+        headers = {
+            "accept": "application/json",
+            "Authorization": api_key
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            documents_list = response.json()
+            
+            # Break the loop if no more data is returned
+            if not documents_list["data"] or len(documents_list["data"]) == 0:
+                break
+            
+            # Extract relevant fields from current page
+            documents = [
+                {
+                    "name": doc["data"]["name"],
+                    "documentID": doc["documentID"],
+                    "tags": doc.get("tags", [])  # Use get() with default empty list
+                }
+                for doc in documents_list["data"]
+            ]
+            
+            # Add documents from this page to our collection
+            all_documents.extend(documents)
+            
+            # Move to the next page
+            page += 1
+            
+        except Exception as e:
+            st.error(f"Error fetching documents (page {page}): {str(e)}")
+            break
+    
+    return all_documents
 
 def attach_tags_to_document(api_key, document_id, tags):
     """Attach tags to a specific document"""
