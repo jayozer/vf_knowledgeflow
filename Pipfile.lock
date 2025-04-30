@@ -688,15 +688,6 @@
             "markers": "python_version >= '3.8' and python_version < '4'",
             "version": "==0.1.2"
         },
-        "llama-extract": {
-            "hashes": [
-                "sha256:8bf7ec8c7db3052fefb0afcdac785e87824593a65fe408eed18726b0fd1d88fa",
-                "sha256:91ecdbe69df5a292b88dee1041d0a702591b7cc1d79a55006f431d77a90f66ed"
-            ],
-            "index": "pypi",
-            "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-            "version": "==0.0.5"
-        },
         "llama-index": {
             "hashes": [
                 "sha256:5c43b46ea9957d539ad823e008c9b6957fbaf4ec5c8bc6903accfb19863edfd9",
