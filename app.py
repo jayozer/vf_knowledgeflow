@@ -21,51 +21,120 @@ st.title("Voiceflow - KnowledgeFlow")
 st.markdown("##### Streamline your content workflow with Voiceflow - KnowledgeFlow. Process diverse inputs, from **PDFs**, **weblinks** to **custom tables**, with advanced features like parsing, auto-summarization, and KB tag management. Edit, download, and organize your content with tags, then upload directly to Voiceflow through an intuitive interface, making content management effortless.")
 
 # Sidebar for configuration
-st.sidebar.markdown("## Configuration")
+st.sidebar.markdown("# 🔧 CONFIGURATION")
+st.sidebar.markdown("---")
 
-# API Keys management
-with st.sidebar.expander("🔑 API Keys", expanded=True):
-    st.write("Enter your API keys below.")
-    api_keys = {}
-    missing_keys = []
-    for api_name in ["VOICEFLOW", "OPENAI", "FIRECRAWL", "LLAMA_CLOUD"]:
-        key = st.text_input(
-            f"{api_name} API Key:",
-            type="password",
-            key=f"{api_name.lower()}_api_key",
-            help=f"Enter your {api_name} API Key.",
-            placeholder=f"❌ API Key not entered"
-        )
-        if key:
-            api_keys[api_name] = key
-            st.markdown(f"✅ {api_name} API Key entered.", unsafe_allow_html=True)
-        else:
-            missing_keys.append(api_name)
+# AI Processing Section  
+st.sidebar.markdown("### 🤖 AI Processing")
+api_keys = {}
+missing_keys = []
 
-# Voiceflow upload options
-with st.sidebar.expander("⚙️ Voiceflow Upload Options"):
-    overwrite = st.radio("Overwrite existing document?", [True, False], index=1)
-    max_chunk_size = st.slider("Max chunk size:", min_value=500, max_value=1500, step=100, value=1000)
+# OpenAI API Key
+openai_key = st.sidebar.text_input(
+    "OpenAI API Key:",
+    type="password",
+    key="openai_api_key",
+    help="Enter your OpenAI API Key for content processing.",
+    placeholder="❌ API Key not entered"
+)
+if openai_key:
+    api_keys["OPENAI"] = openai_key
+    st.sidebar.markdown("✅ **OPENAI API Key entered.**", unsafe_allow_html=True)
+else:
+    missing_keys.append("OPENAI")
 
-# Reset App option
-with st.sidebar.expander("🔄 Session Management"):
-    if st.button("Reset App"):
-        # Clear all session state variables
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        
-        # Remove uploaded files
-        if 'file_uploader' in st.session_state:
-            del st.session_state['file_uploader']
-        
-        # Reset the content input method to default
-        st.session_state['input_method'] = "Enter Website URL"
-        
-        # Clear any stored website URL
-        if 'website_link' in st.session_state:
-            del st.session_state['website_link']
-        
-        st.rerun()
+# Model Selection (right after OpenAI key)
+selected_model = st.sidebar.selectbox(
+    "Model Selection:",
+    options=["gpt-4.1", "gpt-4.1-mini", "o3", "o4-mini"],
+    index=0,
+    help="Choose the AI model for content processing."
+)
+
+# Model behavior info
+if selected_model.startswith('o'):
+    st.sidebar.info("💡 O models don't use temperature parameter")
+else:
+    st.sidebar.info("💡 GPT models use temperature=0")
+
+st.sidebar.markdown("---")
+
+# Content Extraction Section
+st.sidebar.markdown("### 📥 Content Extraction")
+
+# Firecrawl API Key
+firecrawl_key = st.sidebar.text_input(
+    "Firecrawl API Key:",
+    type="password",
+    key="firecrawl_api_key",
+    help="Enter your Firecrawl API Key for web content extraction.",
+    placeholder="❌ API Key not entered"
+)
+if firecrawl_key:
+    api_keys["FIRECRAWL"] = firecrawl_key
+    st.sidebar.markdown("✅ **FIRECRAWL API Key entered.**", unsafe_allow_html=True)
+else:
+    missing_keys.append("FIRECRAWL")
+
+# LlamaCloud API Key
+llama_key = st.sidebar.text_input(
+    "LlamaCloud API Key:",
+    type="password",
+    key="llama_cloud_api_key",
+    help="Enter your LlamaCloud API Key for PDF parsing.",
+    placeholder="❌ API Key not entered"
+)
+if llama_key:
+    api_keys["LLAMA_CLOUD"] = llama_key
+    st.sidebar.markdown("✅ **LLAMA_CLOUD API Key entered.**", unsafe_allow_html=True)
+else:
+    missing_keys.append("LLAMA_CLOUD")
+
+st.sidebar.markdown("---")
+
+# Voiceflow Upload Section
+st.sidebar.markdown("### 📤 Voiceflow Upload")
+
+# Voiceflow API Key
+voiceflow_key = st.sidebar.text_input(
+    "Voiceflow API Key:",
+    type="password",
+    key="voiceflow_api_key",
+    help="Enter your Voiceflow API Key for knowledge base uploads.",
+    placeholder="❌ API Key not entered"
+)
+if voiceflow_key:
+    api_keys["VOICEFLOW"] = voiceflow_key
+    st.sidebar.markdown("✅ **VOICEFLOW API Key entered.**", unsafe_allow_html=True)
+else:
+    missing_keys.append("VOICEFLOW")
+
+# Upload settings
+overwrite = st.sidebar.radio("Overwrite existing:", ["False", "True"], index=0) == "True"
+max_chunk_size = st.sidebar.slider("Max chunk size:", min_value=500, max_value=1500, step=100, value=1000)
+st.sidebar.caption(f"📏 {max_chunk_size} tokens per chunk")
+
+st.sidebar.markdown("---")
+
+# Session Management
+st.sidebar.markdown("### 🔄 SESSION")
+if st.sidebar.button("Reset App", type="secondary"):
+    # Clear all session state variables
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    
+    # Remove uploaded files
+    if 'file_uploader' in st.session_state:
+        del st.session_state['file_uploader']
+    
+    # Reset the content input method to default
+    st.session_state['input_method'] = "Enter Website URL"
+    
+    # Clear any stored website URL
+    if 'website_link' in st.session_state:
+        del st.session_state['website_link']
+    
+    st.rerun()
 
 # Initialize session state variables
 if 'processed_content' not in st.session_state:
@@ -182,10 +251,10 @@ With the following exception/modification: """
                 # Process the content
                 processed_content = process_markdown(content)
                 openai_client = initialize_openai(api_keys["OPENAI"])
-                final_cleaned_content = clean_markdown_with_llm(openai_client, processed_content)
+                final_cleaned_content = clean_markdown_with_llm(openai_client, processed_content, selected_model)
                 
                 # Generate summary
-                summary = summarize_content(api_keys["OPENAI"], final_cleaned_content)
+                summary = summarize_content(api_keys["OPENAI"], final_cleaned_content, selected_model)
                 
                 # Extract title from summary or processed content
                 content_to_search = summary + "\n\n" + final_cleaned_content

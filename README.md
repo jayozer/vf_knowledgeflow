@@ -58,6 +58,14 @@ ___
 - LlamaParse
 - Firecrawl
 
+### 🆕 Recent Updates
+
+**Model Selection Enhancement**
+- Added support for additional OpenAI models in the sidebar configuration
+- Available models now include: `gpt-4.1`, `gpt-4.1-mini`, `o3`, and `o4-mini`
+- Enhanced model behavior information: O-series models (o3, o4-mini) don't use temperature parameter, while GPT models use temperature=0
+- Model selection is conveniently located in the sidebar under "🤖 AI Processing" section
+
 ### ⚠️ Known Issues
 - Max Chunk slider defaults to 1000 tokens and currently cannot be adjusted 
 
