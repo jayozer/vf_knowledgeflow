@@ -33,30 +33,22 @@ def extract_content(app, url, formats=["markdown"], only_main_content=True):
     str: The scraped content from the URL, formatted as markdown.
     
     """
-    
-    # Pass parameters directly as keyword arguments according to v1 API
-    result = app.scrape_url(url, formats=formats, onlyMainContent=only_main_content)
-    
-    # Extract markdown content from the data object
-    data = result.get('data', {})
-    markdown_content = data.get('markdown', '')
-    
-    # If markdown content is not available, try other formats in data
-    if not markdown_content:
-        # Try HTML content if markdown is not available
-        html_content = data.get('html', '')
+    try:
+        # Pass parameters as keyword arguments directly to the scrape_url method
+        result = app.scrape_url(url, formats=formats, onlyMainContent=only_main_content)
+        
+        # The result is an object, so we access its attributes directly.
+        # Use getattr for safe access.
+        markdown_content = getattr(result, 'markdown', None)
+        if markdown_content:
+            return markdown_content.strip()
+        
+        # Fallback to HTML content if markdown is not available
+        html_content = getattr(result, 'html', None)
         if html_content:
             return html_content.strip()
-        
-        # Fall back to combining available content
-        combined_content = ""
-        for key, value in data.items():
-            if isinstance(value, str) and key not in ['metadata']:
-                combined_content += f"## {key.capitalize()}\n\n{value}\n\n"
-        
-        if combined_content:
-            return combined_content.strip()
-        else:
-            return "No content extracted from the URL."
-    
-    return markdown_content.strip()
+            
+        return "No content extracted from the URL."
+
+    except Exception as e:
+        raise Exception(f"Scraping failed: {e}")
