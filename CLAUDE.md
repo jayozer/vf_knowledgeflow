@@ -87,3 +87,4 @@ The application requires these API keys (managed via `.env` file):
 ## Git Commit Guidelines
 
 - Do not mention Claude in git commit messages
+- Do not add anything related to Claude contributed or Claude made this to the commit messages
