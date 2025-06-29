@@ -34,12 +34,8 @@ def extract_content(app, url, formats=["markdown"], only_main_content=True):
     
     """
     
-    params = {
-        "formats": formats,
-        "onlyMainContent": only_main_content
-    }
-    
-    result = app.scrape_url(url, params=params)
+    # Pass parameters directly as keyword arguments according to v1 API
+    result = app.scrape_url(url, formats=formats, onlyMainContent=only_main_content)
     
     # Extract markdown content
     markdown_content = result.get('markdown', '')
