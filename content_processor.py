@@ -255,18 +255,20 @@ Answer only with the succinct context and nothing else."""
 
         try:
             response = self.anthropic_client.messages.create(
-                model="claude-sonnet-4-20250514",  # Using Claude Sonnet 4
+                model="claude-sonnet-4-20250514",
                 max_tokens=200,
                 temperature=0.0,
+                system=[
+                    {
+                        "type": "text",
+                        "text": DOCUMENT_CONTEXT_PROMPT.format(doc_content=document_text),
+                        "cache_control": {"type": "ephemeral"}  # Cache the full document
+                    }
+                ],
                 messages=[
                     {
                         "role": "user", 
                         "content": [
-                            {
-                                "type": "text",
-                                "text": DOCUMENT_CONTEXT_PROMPT.format(doc_content=document_text),
-                                "cache_control": {"type": "ephemeral"}  # Cache the full document
-                            },
                             {
                                 "type": "text",
                                 "text": CHUNK_CONTEXT_PROMPT.format(chunk_content=chunk_text),
@@ -274,7 +276,6 @@ Answer only with the succinct context and nothing else."""
                         ]
                     }
                 ],
-                extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"}
             )
             
             # Track token usage
@@ -390,7 +391,15 @@ KEYWORDS: [keyword1] | [keyword2] | [keyword3]"""
                 chunk['contextualized_text'] = f"{chunk['text']}\n\nContext: {context_text}"
                 return chunk
             
-            if parallel_threads > 1:
+            # Disable parallel processing if using cache to ensure sequential calls
+            if generate_context:
+                for i, chunk in enumerate(chunks):
+                    # Update the first chunk with cache_control
+                    if i == 0:
+                        # This is a placeholder, as the actual cache control is in generate_contextual_embedding
+                        pass
+                    chunks[i] = process_chunk_context(chunk)
+            elif parallel_threads > 1:
                 with ThreadPoolExecutor(max_workers=parallel_threads) as executor:
                     futures = [executor.submit(process_chunk_context, chunk) for chunk in chunks]
                     chunks = [future.result() for future in as_completed(futures)]

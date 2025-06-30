@@ -92,15 +92,17 @@ Answer only with the succinct context and nothing else."""
                 model="claude-sonnet-4-20250514",
                 max_tokens=200,
                 temperature=0.0,
+                system=[
+                    {
+                        "type": "text",
+                        "text": DOCUMENT_CONTEXT_PROMPT.format(doc_content=doc_content),
+                        "cache_control": {"type": "ephemeral"}  # Cache the document
+                    }
+                ],
                 messages=[
                     {
                         "role": "user", 
                         "content": [
-                            {
-                                "type": "text",
-                                "text": DOCUMENT_CONTEXT_PROMPT.format(doc_content=doc_content),
-                                "cache_control": {"type": "ephemeral"}  # Cache the document
-                            },
                             {
                                 "type": "text",
                                 "text": CHUNK_CONTEXT_PROMPT.format(chunk_content=chunk_content),
@@ -108,7 +110,6 @@ Answer only with the succinct context and nothing else."""
                         ]
                     }
                 ],
-                extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"}
             )
             
             # Track token usage

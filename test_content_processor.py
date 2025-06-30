@@ -38,9 +38,13 @@ with st.sidebar:
     
     st.subheader("Chunking Settings")
     
+    # Auto-select strategy if content is available
+    strategy_index = 0
+
     strategy = st.selectbox(
         "Chunking Strategy",
         ["manual", "semantic", "paragraph"],
+        index=strategy_index,
         help="Choose how to split the content into chunks"
     )
     
@@ -65,8 +69,6 @@ with st.sidebar:
     else:
         overlap_tokens = 0
     
-    st.divider()
-    
     st.subheader("Enhancement Options")
     
     generate_context = st.checkbox(
@@ -80,17 +82,20 @@ with st.sidebar:
         value=True,
         help="Generate summaries, questions, and keywords for each chunk"
     )
-    
+
+    st.divider()
+
+    st.subheader("Performance Settings")
+
+    parallel_processing = st.checkbox(
+        "Enable Parallel Processing",
+        value=False,
+        help="Use multiple threads to speed up processing. Will be disabled if 'Generate Contextual Embeddings' is on to ensure caching works correctly.",
+        disabled=generate_context
+    )
+
     if generate_context:
-        parallel_threads = st.slider(
-            "Parallel Processing Threads",
-            min_value=1,
-            max_value=10,
-            value=5,
-            help="Number of threads for parallel context generation"
-        )
-    else:
-        parallel_threads = 1
+        st.info("ℹ️ Parallel processing is disabled when generating contextual embeddings to ensure prompt caching is effective.")
 
 # Main content area
 tab1, tab2, tab3 = st.tabs(["📝 Input", "🔍 Preview Chunks", "📊 Token Usage"])
@@ -132,7 +137,7 @@ with tab1:
                     overlap_tokens=overlap_tokens,
                     generate_metadata=generate_metadata,
                     generate_context=generate_context,
-                    parallel_threads=parallel_threads if generate_context else 1
+                    parallel_threads=5 if parallel_processing else 1
                 )
                 
                 st.session_state.chunks = chunks
@@ -141,7 +146,7 @@ with tab1:
                 # Display token usage if context was generated
                 if generate_context:
                     stats = processor.get_token_usage_stats()
-                    st.info(f"💰 Cache savings: {stats['cache_savings_percentage']:.1f}% of tokens read from cache (90% discount)")
+                    st.info(f"💰 Cache savings: {stats['cache_savings_percentage']:.1f}% of tokens read from cache")
     
     with col2:
         if st.button("🗑️ Clear Results"):
