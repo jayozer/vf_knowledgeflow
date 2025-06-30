@@ -8,7 +8,7 @@ VoiceFlow KnowledgeFlow is a Streamlit-based web application that streamlines co
 
 ## Environment Setup
 
-Use UV for Python package management:
+Use UV for Python package management and virtual environments:
 ```bash
 # Create virtual environment
 uv venv
@@ -83,6 +83,12 @@ The application requires these API keys (managed via `.env` file):
 - Uses Streamlit Cloud for deployment (live at: https://voiceflow-knowledgeflow.streamlit.app/)
 - Environment variables managed through `.env` file (gitignored)
 - Consider implementing type hints and testing framework for future development
+
+## AI Model Preferences
+
+### Default Models
+- **OpenAI**: Use `gpt-4.1` as the default model for OpenAI API calls
+- **Anthropic**: Use `claude-sonnet-4` as the default model for Anthropic API calls
 
 ## Git Commit Guidelines
 

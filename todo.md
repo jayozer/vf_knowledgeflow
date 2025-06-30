@@ -2,19 +2,12 @@
 
 ## Priority Order (High Impact First)
 
-- [ ] **Enhanced Content Processing**
-  - [ ] Chunking strategy selector (manual vs semantic)
-  - [ ] Preview and edit chunks before upload
-  - [ ] Per-chunk summaries, questions, and contextual prep
-  - [ ] Real-time processing status with quality metrics
-  - [ ] Auto-select best settings by content type
 
 - [ ] **Upload Workflow Improvements**
   - [ ] Drag-and-drop file uploads with queue and progress
   - [ ] Upload scheduling and notifications
 
 - [ ] **Metadata Engine**
-  - [ ] AI-based metadata generation and tagging
   - [ ] Metadata-based filtering via Filter with Metadata API
 
 - [ ] **UI/UX Overhaul**
@@ -35,10 +28,18 @@
 - [ ] **Quality & Maintenance**
   - [ ] Chunk quality scoring and AI content improvements
   - [ ] Fix leading spaces in `requirements.txt`
-  - [ ] Add tests and ensure `pytest` passes
 
 ## Completed
 
+- [x] **Enhanced Content Processing**
+  - [x] Chunking strategy selector (manual vs semantic)
+  - [x] Preview and edit chunks before upload
+  - [x] Per-chunk summaries, questions, and contextual prep
+  - [x] Real-time processing status with quality metrics
+- [x] **Metadata Engine**
+  - [x] AI-based metadata generation and tagging
+- [x] **Quality & Maintenance**
+  - [x] Add tests and ensure `pytest` passes
 - [x] **Document Management Dashboard**
   - [x] "Document Manager" page using Document List API
   - [x] Pagination, search, type/status filters
